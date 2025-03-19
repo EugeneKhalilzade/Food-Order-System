@@ -1,0 +1,48 @@
+package org.example.foodordersystem.service;
+
+import lombok.RequiredArgsConstructor;
+import org.example.foodordersystem.model.dto.AuthRequestDTO;
+import org.example.foodordersystem.model.dto.UserDTO;
+import org.example.foodordersystem.model.entity.User;
+import org.example.foodordersystem.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final MyUserDetailsService myUserDetailsService;
+
+
+    public String register(AuthRequestDTO authRequestDTO) {
+        if (userRepository.existsByUsername(authRequestDTO.getUsername())) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        User user = new User();
+        user.setUsername(authRequestDTO.getUsername());
+        user.setEmail(authRequestDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(authRequestDTO.getPassword()));
+        user.setRole(authRequestDTO.getRole());
+        userRepository.save(user);
+        return "User registered successfully!";
+    }
+
+    public String login(AuthRequestDTO authRequestDTO) {
+        User user = userRepository.findByUsername(AuthRequestDTO.getUsername())
+                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+
+        if (!passwordEncoder.matches(authRequestDTO.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        UserDetails userDetails = myUserDetailsService.loadUserByUsername(user.getUsername());
+
+        return jwtService.generateToken(userDetails.getUsername());
+    }
+}
