@@ -1,22 +1,21 @@
 package org.example.foodordersystem.service;
 
 import org.example.foodordersystem.model.dto.UserDTO;
-import org.example.foodordersystem.model.entity.Role;
 
 import java.util.List;
-
+import java.util.Optional;
+//Bu class bu formada olacaq
 public interface UserService {
     List<UserDTO> getAllUsers();
 
-    UserDTO getUserById(Long id);
+    Optional<UserDTO> getUserById(Long id);
 
-    UserDTO findByUsername(String username);
+    Optional<UserDTO> getUserByUsername(String username);
 
-    UserDTO createUser(UserDTO userDTO);
+    UserDTO registerUser(UserDTO userDTO, String roleName);
 
-    UserDTO updateUser(Long id, UserDTO userDTO);
+    Optional<UserDTO> updateUser(Long id, UserDTO userDTO);
 
-    UserDTO updateUserRole(Long id, Role role);
 
     boolean deleteUser(Long id);
 }

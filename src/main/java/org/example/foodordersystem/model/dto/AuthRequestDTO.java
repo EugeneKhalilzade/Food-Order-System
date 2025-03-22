@@ -4,7 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-
+import org.example.foodordersystem.model.entity.Role;
+//burada deyisiklik var
 @Data
 public class AuthRequestDTO {
     private Long id;
@@ -19,6 +20,6 @@ public class AuthRequestDTO {
 
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-
-    private String role;
+//Burda deyisiklik olunub
+    private Role role;
 }

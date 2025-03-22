@@ -1,3 +1,4 @@
+
 package org.example.foodordersystem.service.impl;
 
 import org.example.foodordersystem.model.dto.UserDTO;
@@ -6,14 +7,13 @@ import org.example.foodordersystem.model.entity.User;
 import org.example.foodordersystem.repository.RoleRepository;
 import org.example.foodordersystem.repository.UserRepository;
 import org.example.foodordersystem.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+//Service bu formada olacaqq
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -21,7 +21,6 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder) {
@@ -63,8 +62,8 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-
-        Role role = roleRepository.findByName(roleName)
+//Burada deyisiklik var
+        Role role = (Role) roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         user.setRole(role);
@@ -75,49 +74,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
-        if (!userRepository.existsById(id)) {
-            return Optional.empty();
-        }
+        return userRepository.findById(id).map(user -> {
+            // Username və email başqa istifadəçiyə aid olmamalıdır
+            if (!user.getUsername().equals(userDTO.getUsername()) &&
+                    userRepository.existsByUsername(userDTO.getUsername())) {
+                throw new RuntimeException("Username already exists");
+            }
 
-        Optional<User> existingUserByUsername = userRepository.findByUsername(userDTO.getUsername());
-        if (existingUserByUsername.isPresent() && !existingUserByUsername.get().getId().equals(id)) {
-            throw new RuntimeException("Username already exists");
-        }
+            if (!user.getEmail().equals(userDTO.getEmail()) &&
+                    userRepository.existsByEmail(userDTO.getEmail())) {
+                throw new RuntimeException("Email already exists");
+            }
 
-        Optional<User> existingUserByEmail = userRepository.findByEmail(userDTO.getEmail());
-        if (existingUserByEmail.isPresent() && !existingUserByEmail.get().getId().equals(id)) {
-            throw new RuntimeException("Email already exists");
-        }
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
 
-        User user = userRepository.findById(id).get();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
+            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            }
 
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
-
-        User updatedUser = userRepository.save(user);
-        return Optional.of(convertToDTO(updatedUser));
+            return convertToDTO(userRepository.save(user));
+        });
     }
 
     @Override
     public boolean deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            return false;
-        }
-
-        userRepository.deleteById(id);
-        return true;
+        return userRepository.findById(id).map(user -> {
+            userRepository.delete(user);
+            return true;
+        }).orElse(false);
     }
 
+    //burada deyisiklik var
     private UserDTO convertToDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setRole(user.getRole().getName());
-        // Don't set password in DTO for security reasons
-        return dto;
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().getName(), user.getPassword());
     }
 }

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+//Bu classda deyisiklikler var
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -43,44 +43,45 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream()
+        List<OrderDTO> collect = orderRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+        return collect;
     }
 
     @Override
     public List<OrderDTO> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-                .map(this::convertToDTO)
+                .map((OrderRepository order) -> convertToDTO((Order) order))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<OrderDTO> getOrdersByStatus(String status) {
         return orderRepository.findByStatus(status).stream()
-                .map(this::convertToDTO)
+                .map((OrderRepository order) -> convertToDTO((Order) order))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<OrderDTO> getOrdersByUserIdAndStatus(Long userId, String status) {
         return orderRepository.findByUserIdAndStatus(userId, status).stream()
-                .map(this::convertToDTO)
+                .map((OrderRepository order) -> convertToDTO((Order) order))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<OrderDTO> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return orderRepository.findByOrderDateBetween(startDate, endDate).stream()
-                .map(this::convertToDTO)
+                .map((OrderRepository order) -> convertToDTO((Order) order))
                 .collect(Collectors.toList());
     }
-
     @Override
     public Optional<OrderDTO> getOrderById(Long id) {
         return orderRepository.findById(id)
-                .map(this::convertToDTO);
+                .map(this::convertToDTO);  // Correcting the map function
     }
+
 
     @Override
     @Transactional
@@ -94,16 +95,15 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus("PENDING");
 
         // Calculate total amount
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (OrderItemDTO itemDTO : orderDTO.getOrderItems()) {
-            totalAmount = totalAmount.add(itemDTO.getPrice().multiply(new BigDecimal(itemDTO.getQuantity())));
-        }
+        BigDecimal totalAmount = orderDTO.getOrderItems().stream()
+                .map(itemDTO -> itemDTO.getPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         order.setTotalAmount(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
 
-        List<OrderItem> orderItems = new ArrayList<>();
-        for (OrderItemDTO itemDTO : orderDTO.getOrderItems()) {
+        List<OrderItem> orderItems = orderDTO.getOrderItems().stream().map(itemDTO -> {
             MenuItem menuItem = menuItemRepository.findById(itemDTO.getMenuItemId())
                     .orElseThrow(() -> new RuntimeException("Menu item not found: " + itemDTO.getMenuItemId()));
 
@@ -112,8 +112,8 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setMenuItem(menuItem);
             orderItem.setQuantity(itemDTO.getQuantity());
             orderItem.setPrice(itemDTO.getPrice());
-            orderItems.add(orderItem);
-        }
+            return orderItem;
+        }).collect(Collectors.toList());
 
         orderItemRepository.saveAll(orderItems);
 
@@ -123,17 +123,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Optional<OrderDTO> updateOrderStatus(Long id, String status) {
-        Optional<Order> orderOpt = orderRepository.findById(id);
+        Optional<Order> orderOpt = orderRepository.findById(id); // Düzəldilmişdir
 
         if (orderOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        Order order = orderOpt.get();
+        Order order = orderOpt.get(); // Cast etməyə ehtiyac yoxdur
         order.setStatus(status);
-        Order updatedOrder = orderRepository.save(order);
 
-        return Optional.of(convertToDTO(updatedOrder));
+        return Optional.of(convertToDTO(orderRepository.save(order)));
     }
 
     private OrderDTO convertToDTO(Order order) {
@@ -144,16 +143,20 @@ public class OrderServiceImpl implements OrderService {
         dto.setStatus(order.getStatus());
         dto.setTotalAmount(order.getTotalAmount());
 
-        List<OrderItemDTO> orderItemDTOs = orderItemRepository.findByOrder(order).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+        List<OrderItemDTO> orderItemDTOs = new ArrayList<>(orderItems.size());  // Optimize ArrayList size
+
+        // Using for-each loop for clarity and easy debugging
+        for (OrderItem orderItem : orderItems) {
+            orderItemDTOs.add(convertOrderItemToDTO(orderItem));  // Clearer method name for item conversion
+        }
 
         dto.setOrderItems(orderItemDTOs);
 
         return dto;
     }
 
-    private OrderItemDTO convertToDTO(OrderItem orderItem) {
+    private OrderItemDTO convertOrderItemToDTO(OrderItem orderItem) {
         OrderItemDTO dto = new OrderItemDTO();
         dto.setId(orderItem.getId());
         dto.setMenuItemId(orderItem.getMenuItem().getId());
@@ -162,4 +165,6 @@ public class OrderServiceImpl implements OrderService {
         dto.setPrice(orderItem.getPrice());
         return dto;
     }
+
+
 }

@@ -2,13 +2,13 @@ package org.example.foodordersystem.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.foodordersystem.model.dto.AuthRequestDTO;
-import org.example.foodordersystem.model.dto.UserDTO;
+import org.example.foodordersystem.model.dto.AuthResponseDTO;
 import org.example.foodordersystem.model.entity.User;
 import org.example.foodordersystem.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+//bu classda deyisiklik var
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,8 +33,9 @@ public class AuthService {
         return "User registered successfully!";
     }
 
-    public String login(AuthRequestDTO authRequestDTO) {
-        User user = userRepository.findByUsername(AuthRequestDTO.getUsername())
+    //Burda deyisiklik olunub
+    public String login(AuthResponseDTO authRequestDTO) {
+        User user = userRepository.findByUsername(authRequestDTO.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
         if (!passwordEncoder.matches(authRequestDTO.getPassword(), user.getPassword())) {
