@@ -3,9 +3,11 @@ package org.example.foodordersystem.model.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor//burada deyisiklik var
 public class UserDTO {
     private Long id;
 
@@ -21,4 +23,5 @@ public class UserDTO {
     private String password;
 
     private String role;
+
 }

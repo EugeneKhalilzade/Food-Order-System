@@ -1,13 +1,14 @@
 package org.example.foodordersystem.repository;
 
+import org.example.foodordersystem.model.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+//burda duzelis var
 @Repository
-public interface OrderRepository extends JpaRepository<OrderRepository, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
     List<OrderRepository> findByUserId(Long userId);
 
     List<OrderRepository> findByStatus(String status);
