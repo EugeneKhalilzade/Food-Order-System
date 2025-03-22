@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-//Bu classda deyisiklikler var
+
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -79,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Optional<OrderDTO> getOrderById(Long id) {
         return orderRepository.findById(id)
-                .map(this::convertToDTO);  // Correcting the map function
+                .map(this::convertToDTO);
     }
 
 
@@ -123,13 +123,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Optional<OrderDTO> updateOrderStatus(Long id, String status) {
-        Optional<Order> orderOpt = orderRepository.findById(id); // Düzəldilmişdir
+        Optional<Order> orderOpt = orderRepository.findById(id);
 
         if (orderOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        Order order = orderOpt.get(); // Cast etməyə ehtiyac yoxdur
+        Order order = orderOpt.get();
         order.setStatus(status);
 
         return Optional.of(convertToDTO(orderRepository.save(order)));

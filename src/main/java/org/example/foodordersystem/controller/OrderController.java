@@ -50,7 +50,7 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<OrderDTO> createOrder(
             @Valid @RequestBody OrderDTO orderDTO,
             @RequestParam Long userId) {

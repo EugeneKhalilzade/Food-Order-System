@@ -1,22 +1,22 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/foodorder  # Docker Compose'd? 'db' servisin? ba?lan?r
-    username: postgres                      # PostgreSQL istifad?çi ad?
-    password: 1234                  # PostgreSQL ?ifr?si
+    url: jdbc:postgresql://db:5432/foodorder  # Connects to the 'db' service in Docker Compose
+    username: postgres                       # PostgreSQL username
+    password: 1234                           # PostgreSQL password
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10                # Veril?nl?r bazas? ?laq? hovuzunun maksimum ölçüsü
+      maximum-pool-size: 10                  # Maximum size of the database connection pool
   jpa:
     hibernate:
-      ddl-auto: update                      # Hibernate, veril?nl?r bazas?n? yenil?sin
-    show-sql: true                           # SQL sor?ular?n? konsolda göst?rm?k üçün (yaz?l?m inki?af?nda faydal?d?r)
+      ddl-auto: update                       # Hibernate will update the database schema
+    show-sql: true                           # Show SQL queries in the console (useful for development)
     properties:
       hibernate:
-        format_sql: true                     # SQL format?n? oxunaql? et
+        format_sql: true                     # Make the SQL format more readable
   jackson:
     serialization:
-      INDENT_OUTPUT: true                   # JSON cavab?n? oxunaql? etm?k üçün
+      INDENT_OUTPUT: true                    # Make JSON responses more readable
   server:
-    port: 8080                              # Spring Boot t?tbiqi 8080 portunda i?l?y?c?k
+    port: 8080                               # The Spring Boot application will run on port 8080
   application:
-    name: FoodOrderSystem                    # T?tbiq ad?
+    name: FoodOrderSystem                    # Name of the application

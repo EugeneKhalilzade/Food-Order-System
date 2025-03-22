@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-// bu classda deyisiklik var
+
 @Service
 public class MenuServiceImpl implements MenuService {
 
@@ -29,7 +29,7 @@ public class MenuServiceImpl implements MenuService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-//burada deyisiklik var
+
     @Override
     public List<MenuItemDTO> getMenuItemsByCategory(String category) {
         return menuItemRepository.findByCategory(category)
@@ -38,15 +38,14 @@ public class MenuServiceImpl implements MenuService {
                 .collect(Collectors.toList());
     }
 
-    //burada deyisiklik var
     @Override
     public List<MenuItemDTO> getMenuItemsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-        return menuItemRepository.findByPriceRange(minPrice, maxPrice) // Daha uyğun metod adı
+        return menuItemRepository.findByPriceRange(minPrice, maxPrice)
                 .stream()
                 .map((MenuItemRepository menuItem) -> convertToDTO((MenuItem) menuItem))
                 .collect(Collectors.toList());
     }
-//burada deyisiklik var
+
     @Override
     public List<MenuItemDTO> getMenuItemsByName(String name) {
         return menuItemRepository.findByNameContainingIgnoreCase(name)
