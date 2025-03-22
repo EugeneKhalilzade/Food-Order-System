@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-//burda duzelis var
+
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<OrderRepository> findByUserId(Long userId);

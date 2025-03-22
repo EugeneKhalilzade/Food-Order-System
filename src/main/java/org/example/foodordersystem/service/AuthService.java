@@ -8,7 +8,7 @@ import org.example.foodordersystem.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-//bu classda deyisiklik var
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,7 +33,6 @@ public class AuthService {
         return "User registered successfully!";
     }
 
-    //Burda deyisiklik olunub
     public String login(AuthResponseDTO authRequestDTO) {
         User user = userRepository.findByUsername(authRequestDTO.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));

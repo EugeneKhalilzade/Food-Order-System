@@ -7,8 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
-//burada deyisiklik var
+
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     List<MenuItemRepository> findByCategory(String category);
@@ -19,6 +18,5 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     List<MenuItemRepository> findByCategoryAndPriceLessThanEqual(String category, BigDecimal maxPrice);
 
     List<MenuItemRepository> findByNameContainingIgnoreCase(String name);
-
 
 }

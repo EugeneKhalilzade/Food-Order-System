@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor//burada deyisiklik var
+@AllArgsConstructor
 public class UserDTO {
     private Long id;
 
@@ -23,5 +23,4 @@ public class UserDTO {
     private String password;
 
     private String role;
-
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-// bu classda deyisiklik var
+
 @Service
 public class MyUserDetailsService implements UserDetailsService {
     @Autowired
@@ -27,7 +27,6 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Username not found");
         }
 
-        //burada deyisiklik olunub
         User user = userOptional.get();
         Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRole().toString()));
 
@@ -37,7 +36,4 @@ public class MyUserDetailsService implements UserDetailsService {
                 authorities
         );
     }
-
-
-
 }

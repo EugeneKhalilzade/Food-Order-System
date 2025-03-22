@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-//Service bu formada olacaqq
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-//Burada deyisiklik var
+
         Role role = (Role) roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
@@ -75,7 +75,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
         return userRepository.findById(id).map(user -> {
-            // Username və email başqa istifadəçiyə aid olmamalıdır
             if (!user.getUsername().equals(userDTO.getUsername()) &&
                     userRepository.existsByUsername(userDTO.getUsername())) {
                 throw new RuntimeException("Username already exists");
@@ -105,7 +104,6 @@ public class UserServiceImpl implements UserService {
         }).orElse(false);
     }
 
-    //burada deyisiklik var
     private UserDTO convertToDTO(User user) {
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().getName(), user.getPassword());
     }
