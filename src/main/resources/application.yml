@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/foodorder  # Connects to the 'db' service in Docker Compose
-    username: postgres                       # PostgreSQL username
-    password: 1234                           # PostgreSQL password
+    url: jdbc:postgresql://localhost:5432/food_order_db # Connects to the 'db' service in Docker Compose
+    username: admin                       # PostgreSQL username
+    password: admin123                           # PostgreSQL password
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10                  # Maximum size of the database connection pool
