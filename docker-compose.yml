@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin  # İstifadəçi adı
+      POSTGRES_PASSWORD: admin123  # Şifrə
+      POSTGRES_DB: food_order_db  # Baza adı
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Məlumatların saxlanması üçün
+volumes:
+  postgres-data:
