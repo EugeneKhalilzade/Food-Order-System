@@ -18,4 +18,9 @@ public class Role {
 
     @OneToMany(mappedBy = "role")
     private List<User> users;
+
+    @Enumerated(EnumType.STRING)
+    private org.example.foodordersystem.model.enums.Role enumRole;
+
 }
+

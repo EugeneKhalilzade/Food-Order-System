@@ -1,12 +1,12 @@
-
 package org.example.foodordersystem.service.impl;
 
 import org.example.foodordersystem.model.dto.UserDTO;
-import org.example.foodordersystem.model.entity.Role;
 import org.example.foodordersystem.model.entity.User;
+import org.example.foodordersystem.model.entity.Role;
 import org.example.foodordersystem.repository.RoleRepository;
 import org.example.foodordersystem.repository.UserRepository;
 import org.example.foodordersystem.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,32 +20,35 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<UserDTO> getUserById(Long id) {
         return userRepository.findById(id)
-                .map(this::convertToDTO);
+                .map(user -> modelMapper.map(user, UserDTO.class));
     }
 
     @Override
     public Optional<UserDTO> getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(this::convertToDTO);
+                .map(user -> modelMapper.map(user, UserDTO.class));
     }
 
     @Override
@@ -58,41 +61,44 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        // Convert the roleName (String) to the Enum Role
+        org.example.foodordersystem.model.enums.Role enumRole =
+                org.example.foodordersystem.model.enums.Role.valueOf(roleName);
 
-        Role role = (Role) roleRepository.findByName(roleName)
+        // Fetch the Role entity using the enumRole value
+        Role role = roleRepository.findByEnumRole(enumRole)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
+        // Map UserDTO to User
+        User user = modelMapper.map(userDTO, User.class);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(role);
 
         User savedUser = userRepository.save(user);
-        return convertToDTO(savedUser);
+        return modelMapper.map(savedUser, UserDTO.class);
     }
 
     @Override
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
-        return userRepository.findById(id).map(user -> {
-            if (!user.getUsername().equals(userDTO.getUsername()) &&
+        return userRepository.findById(id).map(existingUser -> {
+            if (!existingUser.getUsername().equals(userDTO.getUsername()) &&
                     userRepository.existsByUsername(userDTO.getUsername())) {
                 throw new RuntimeException("Username already exists");
             }
 
-            if (!user.getEmail().equals(userDTO.getEmail()) &&
+            if (!existingUser.getEmail().equals(userDTO.getEmail()) &&
                     userRepository.existsByEmail(userDTO.getEmail())) {
                 throw new RuntimeException("Email already exists");
             }
 
-            user.setUsername(userDTO.getUsername());
-            user.setEmail(userDTO.getEmail());
+            // Update existing user with new values
+            modelMapper.map(userDTO, existingUser);
 
             if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+                existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             }
 
-            return convertToDTO(userRepository.save(user));
+            return modelMapper.map(userRepository.save(existingUser), UserDTO.class);
         });
     }
 
@@ -102,9 +108,5 @@ public class UserServiceImpl implements UserService {
             userRepository.delete(user);
             return true;
         }).orElse(false);
-    }
-
-    private UserDTO convertToDTO(User user) {
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().getName(), user.getPassword());
     }
 }

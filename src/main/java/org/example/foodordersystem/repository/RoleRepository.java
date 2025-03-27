@@ -1,6 +1,6 @@
 package org.example.foodordersystem.repository;
 
-import org.example.foodordersystem.model.entity.Role;
+import org.example.foodordersystem.model.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
-    Optional<RoleRepository> findByName(String name);
+    Optional<Role> findByName(String name);
+    Optional<Role> findByEnumRole(org.example.foodordersystem.model.enums.Role enumRole);
 }
