@@ -4,7 +4,7 @@ import org.example.foodordersystem.model.dto.MenuItemDTO;
 import org.example.foodordersystem.model.entity.MenuItem;
 import org.example.foodordersystem.repository.MenuItemRepository;
 import org.example.foodordersystem.service.MenuService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,17 +16,18 @@ import java.util.stream.Collectors;
 public class MenuServiceImpl implements MenuService {
 
     private final MenuItemRepository menuItemRepository;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    public MenuServiceImpl(MenuItemRepository menuItemRepository) {
+    public MenuServiceImpl(MenuItemRepository menuItemRepository, ModelMapper modelMapper) {
         this.menuItemRepository = menuItemRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     public List<MenuItemDTO> getAllMenuItems() {
         return menuItemRepository.findAll()
                 .stream()
-                .map(this::convertToDTO)
+                .map(menuItem -> modelMapper.map(menuItem, MenuItemDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -34,7 +35,7 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuItemDTO> getMenuItemsByCategory(String category) {
         return menuItemRepository.findByCategory(category)
                 .stream()
-                .map((MenuItemRepository menuItem) -> convertToDTO((MenuItem) menuItem))
+                .map(menuItem -> modelMapper.map(menuItem, MenuItemDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +43,7 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuItemDTO> getMenuItemsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         return menuItemRepository.findByPriceRange(minPrice, maxPrice)
                 .stream()
-                .map((MenuItemRepository menuItem) -> convertToDTO((MenuItem) menuItem))
+                .map(menuItem -> modelMapper.map(menuItem, MenuItemDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -50,32 +51,32 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuItemDTO> getMenuItemsByName(String name) {
         return menuItemRepository.findByNameContainingIgnoreCase(name)
                 .stream()
-                .map((MenuItemRepository menuItem) -> convertToDTO((MenuItem) menuItem))
+                .map(menuItem -> modelMapper.map(menuItem, MenuItemDTO.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<MenuItemDTO> getMenuItemById(Long id) {
         return menuItemRepository.findById(id)
-                .map(this::convertToDTO);
+                .map(menuItem -> modelMapper.map(menuItem, MenuItemDTO.class));
     }
 
     @Override
     public MenuItemDTO createMenuItem(MenuItemDTO menuItemDTO) {
-        MenuItem menuItem = convertToEntity(menuItemDTO);
+        MenuItem menuItem = modelMapper.map(menuItemDTO, MenuItem.class);
         MenuItem savedMenuItem = menuItemRepository.save(menuItem);
-        return convertToDTO(savedMenuItem);
+        return modelMapper.map(savedMenuItem, MenuItemDTO.class);
     }
 
     @Override
     public Optional<MenuItemDTO> updateMenuItem(Long id, MenuItemDTO menuItemDTO) {
         return menuItemRepository.findById(id)
                 .map(existingItem -> {
-                    MenuItem updatedItem = convertToEntity(menuItemDTO);
-                    updatedItem.setId(id);
-                    return menuItemRepository.save(updatedItem);
+                    // Map the DTO to the existing entity
+                    modelMapper.map(menuItemDTO, existingItem);
+                    return menuItemRepository.save(existingItem);
                 })
-                .map(this::convertToDTO);
+                .map(updatedItem -> modelMapper.map(updatedItem, MenuItemDTO.class));
     }
 
     @Override
@@ -85,25 +86,5 @@ public class MenuServiceImpl implements MenuService {
             return true;
         }
         return false;
-    }
-
-    private MenuItemDTO convertToDTO(MenuItem menuItem) {
-        return new MenuItemDTO(
-                menuItem.getId(),
-                menuItem.getName(),
-                menuItem.getDescription(),
-                menuItem.getPrice(),
-                menuItem.getCategory()
-        );
-    }
-
-    private MenuItem convertToEntity(MenuItemDTO dto) {
-        return new MenuItem(
-                dto.getId(), // Yalnız `updateMenuItem` metodu üçün dolacaq
-                dto.getName(),
-                dto.getDescription(),
-                dto.getPrice(),
-                dto.getCategory()
-        );
     }
 }

@@ -20,3 +20,8 @@ spring:
     port: 8080                               # The Spring Boot application will run on port 8080
   application:
     name: FoodOrderSystem                    # Name of the application
+
+    security:
+      user:
+        name: user
+        password: password
