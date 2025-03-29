@@ -23,9 +23,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
-    public Role role;
+    public String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
