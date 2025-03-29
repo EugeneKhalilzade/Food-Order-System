@@ -61,11 +61,9 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        // Convert the roleName (String) to the Enum Role
         org.example.foodordersystem.model.enums.Role enumRole =
                 org.example.foodordersystem.model.enums.Role.valueOf(roleName);
 
-        // Fetch the Role entity using the enumRole value
         Role role = roleRepository.findByEnumRole(enumRole)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
