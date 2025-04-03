@@ -2,7 +2,6 @@ package org.example.foodordersystem.service;
 
 import org.example.foodordersystem.model.entity.User;
 import org.example.foodordersystem.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +15,12 @@ import java.util.Optional;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
-    @Autowired
-    private UserRepository repo;
+
+    private final UserRepository repo;
+
+    public MyUserDetailsService(UserRepository repo) {
+        this.repo = repo;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -28,7 +31,13 @@ public class MyUserDetailsService implements UserDetailsService {
         }
 
         User user = userOptional.get();
-        Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(user.getRole()));
+
+        // Get the role name or type for Spring Security
+        String roleAuthority = user.getRole().getType().name();
+
+        // Prefix with ROLE_ as Spring Security expects this format
+        Collection<? extends GrantedAuthority> authorities =
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + roleAuthority));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

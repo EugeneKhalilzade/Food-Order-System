@@ -2,6 +2,8 @@ package org.example.foodordersystem.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.example.foodordersystem.model.enums.RoleType;
+
 import java.util.List;
 
 @Entity
@@ -16,11 +18,10 @@ public class Role {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoleType type;
+
     @OneToMany(mappedBy = "role")
     private List<User> users;
-
-    @Enumerated(EnumType.STRING)
-    private org.example.foodordersystem.model.enums.Role enumRole;
-
 }
-

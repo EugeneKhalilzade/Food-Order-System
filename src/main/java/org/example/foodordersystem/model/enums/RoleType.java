@@ -1,6 +1,6 @@
 package org.example.foodordersystem.model.enums;
 
-public enum Role {
+public enum RoleType {
     CUSTOMER,
     STAFF,
     ADMIN
