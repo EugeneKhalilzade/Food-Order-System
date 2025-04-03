@@ -9,7 +9,6 @@ public interface UserService {
     List<UserDTO> getAllUsers();
     Optional<UserDTO> getUserById(Long id);
     Optional<UserDTO> getUserByUsername(String username);
-    UserDTO registerUser(UserDTO userDTO, String roleName);
     Optional<UserDTO> updateUser(Long id, UserDTO userDTO);
     boolean deleteUser(Long id);
 }

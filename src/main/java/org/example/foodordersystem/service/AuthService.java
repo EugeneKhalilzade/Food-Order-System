@@ -3,7 +3,10 @@ package org.example.foodordersystem.service;
 import lombok.RequiredArgsConstructor;
 import org.example.foodordersystem.model.dto.AuthRequestDTO;
 import org.example.foodordersystem.model.dto.AuthResponseDTO;
+import org.example.foodordersystem.model.entity.Role;
 import org.example.foodordersystem.model.entity.User;
+import org.example.foodordersystem.model.enums.RoleType;
+import org.example.foodordersystem.repository.RoleRepository;
 import org.example.foodordersystem.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final MyUserDetailsService myUserDetailsService;
@@ -28,7 +32,9 @@ public class AuthService {
         user.setUsername(authRequestDTO.getUsername());
         user.setEmail(authRequestDTO.getEmail());
         user.setPassword(passwordEncoder.encode(authRequestDTO.getPassword()));
-        user.setRole(authRequestDTO.getRole());
+        Role role = roleRepository.findByType(RoleType.valueOf(authRequestDTO.getRole()))
+                .orElseThrow(() -> new RuntimeException("Role not found: " + authRequestDTO.getRole()));
+        user.setRole(role);
         userRepository.save(user);
         return "User registered successfully!";
     }
