@@ -1,12 +1,12 @@
 package org.example.foodordersystem.config;
 
+import lombok.RequiredArgsConstructor;
 import org.example.foodordersystem.service.JwtFilter;
 import org.example.foodordersystem.service.MyUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,16 +17,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    JwtFilter jwtFilter;
-
-    @Autowired
-    MyUserDetailsService myUserDetailsService;
+    private final JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration
+    ) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            MyUserDetailsService myUserDetailsService
+    ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -35,37 +47,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/user-register", "/api/auth/user-login")
                         .permitAll()
                         .requestMatchers("/api/menu/**")
-                        .permitAll()
+                        .hasAnyAuthority("CUSTOMER", "STAFF", "ADMIN")
                         .requestMatchers("/api/users/**")
-                        .permitAll()
+                        .hasAuthority("ADMIN")
                         .requestMatchers("/api/orders/**")
-                        .permitAll()
+                        .hasAnyAuthority("CUSTOMER", "STAFF", "ADMIN")
                         .anyRequest()
                         .authenticated()
-                )
-                .httpBasic(AbstractHttpConfigurer::disable)
+                ).userDetailsService(myUserDetailsService)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
     }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-
-        authenticationManagerBuilder
-                .userDetailsService(myUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-
-        return authenticationManagerBuilder.build();
-    }
-
 }
