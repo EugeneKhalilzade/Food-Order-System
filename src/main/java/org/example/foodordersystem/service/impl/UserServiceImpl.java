@@ -1,7 +1,6 @@
 package org.example.foodordersystem.service.impl;
 
 import org.example.foodordersystem.model.dto.UserDTO;
-import org.example.foodordersystem.repository.RoleRepository;
 import org.example.foodordersystem.repository.UserRepository;
 import org.example.foodordersystem.service.UserService;
 import org.modelmapper.ModelMapper;

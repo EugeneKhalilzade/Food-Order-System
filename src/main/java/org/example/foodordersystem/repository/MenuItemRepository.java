@@ -10,13 +10,12 @@ import java.util.List;
 
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
-    List<MenuItemRepository> findByCategory(String category);
+    List<MenuItem> findByCategory(String category);  // Changed from List<MenuItemRepository>
 
     @Query("SELECT m FROM MenuItem m WHERE m.price BETWEEN :minPrice AND :maxPrice")
-    List<MenuItemRepository> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice);
+    List<MenuItem> findByPriceRange(BigDecimal minPrice, BigDecimal maxPrice);  // Changed from List<MenuItemRepository>
 
-    List<MenuItemRepository> findByCategoryAndPriceLessThanEqual(String category, BigDecimal maxPrice);
+    List<MenuItem> findByCategoryAndPriceLessThanEqual(String category, BigDecimal maxPrice);  // Changed from List<MenuItemRepository>
 
-    List<MenuItemRepository> findByNameContainingIgnoreCase(String name);
-
+    List<MenuItem> findByNameContainingIgnoreCase(String name);  // Changed from List<MenuItemRepository>
 }
