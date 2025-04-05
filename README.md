@@ -1,10 +1,10 @@
-# Restaurant Order System
+# Food Order System
 
 A backend system for restaurant order management with RESTful API endpoints for customer registration, menu management, order processing and some other functionalities
 
 ## Overview
 
-The Restaurant Order System allows customers to browse the menu, place orders, and track order statuses.
+The Food Order System allows customers to browse the menu, place orders, and track order statuses.
 
 ## Technology Stack
 
