@@ -28,7 +28,7 @@ The Food Order System allows customers to browse the menu, place orders, and tra
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/44J-jottabyte/FoodOrderSystem.git
+   git clone https://github.com/EugeneKhalilzade/Food-Order-System.git
    ```
 
 2. Configure database connection in `application.yml`:
