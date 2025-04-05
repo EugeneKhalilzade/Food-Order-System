@@ -32,8 +32,7 @@ The Restaurant Order System allows customers to browse the menu, place orders, a
    ```
 
 2. Configure database connection in `application.yml`:
-
-3. and check `docker-compose.yml`:
+                                 `docker-compose.yml`:
 
 ## Development Workflow
 
