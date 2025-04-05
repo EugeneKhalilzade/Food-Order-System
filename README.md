@@ -1,6 +1,6 @@
 # Food Order System
 
-A backend system for restaurant order management with RESTful API endpoints for customer registration, menu management, order processing and some other functionalities
+A backend system for food order management with RESTful API endpoints for customer registration, menu management, order processing and some other functionalities
 
 ## Overview
 
