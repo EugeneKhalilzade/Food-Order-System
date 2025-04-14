@@ -3,9 +3,7 @@ package org.example.foodordersystem.service;
 import lombok.RequiredArgsConstructor;
 import org.example.foodordersystem.model.dto.AuthRequestDTO;
 import org.example.foodordersystem.model.dto.AuthResponseDTO;
-import org.example.foodordersystem.model.entity.Role;
 import org.example.foodordersystem.model.entity.User;
-import org.example.foodordersystem.model.enums.RoleType;
 import org.example.foodordersystem.repository.RoleRepository;
 import org.example.foodordersystem.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,9 +30,7 @@ public class AuthService {
         user.setUsername(authRequestDTO.getUsername());
         user.setEmail(authRequestDTO.getEmail());
         user.setPassword(passwordEncoder.encode(authRequestDTO.getPassword()));
-        Role role = roleRepository.findByType(RoleType.valueOf(authRequestDTO.getRole()))
-                .orElseThrow(() -> new RuntimeException("Role not found: " + authRequestDTO.getRole()));
-        user.setRole(role);
+        user.setRole(authRequestDTO.getRole());
         userRepository.save(user);
         return "User registered successfully!";
     }
